@@ -1,14 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <automoviles>
-   <auto>
-       <marca>Toyota</marca>
-       <modelo>Corolla</modelo>
-       <año>2020</año>
-   </auto>
-   <auto>
-       <marca>Honda</marca>
-       <modelo>Civic</modelo>
-       <año>2021</año>
-   </auto>
-   
-   <!-- Más automóviles aquí -->
+  <auto>
+    <marca>Toyota</marca>
+    <modelo>Corolla</modelo>
+    <año>2020</año>
+  </auto>
+  <auto>
+    <marca>Honda</marca>
+    <modelo>Civic</modelo>
+    <año>2021</año>
+  </auto>
+  <auto>
+    <marca>BMW</marca>
+    <modelo>BMZ</modelo>
+    <año>2008</año>
+  </auto>
 </automoviles>

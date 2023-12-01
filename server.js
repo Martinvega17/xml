@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 var mysql = require('mysql');
 const { DOMParser } = require('xmldom');
+const { parseString, Builder } = require('xml2js');
 const app = express();
 const port = 3000;
 
@@ -94,9 +95,58 @@ app.post('/guardarAuto', express.json(), (req, res) => {
             res.status(500).json({ error: 'Error al guardar el vehículo en la base de datos.' });
             return;
         }
+
+        // Después de la inserción en la base de datos, actualiza el archivo XML
+        actualizarArchivoXML(marca, modelo, año);
         res.json({ message: 'Vehículo agregado exitosamente en la base de datos.' });
     });
 });
+
+function actualizarArchivoXML(marca, modelo, año) {
+    const autosPath = path.join(__dirname, 'automoviles.xml');
+    fs.readFile(autosPath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+            // Manejar el error de lectura del archivo XML
+            return;
+        }
+
+        try {
+            parseString(data, { explicitArray: false }, (err, result) => {
+                if (err) {
+                    console.error(err);
+                    // Manejar el error al procesar el archivo XML
+                    return;
+                }
+
+                // Agrega el nuevo auto al documento XML
+                result.automoviles.auto.push({
+                    marca: marca,
+                    modelo: modelo,
+                    año: año
+                });
+
+                // Convierte el objeto actualizado a XML
+                const builder = new Builder();
+                const nuevoXML = builder.buildObject(result);
+
+                // Escribe el archivo XML actualizado
+                fs.writeFile(autosPath, nuevoXML, (err) => {
+                    if (err) {
+                        console.error(err);
+                        // Manejar el error de escritura del archivo XML
+                        return;
+                    }
+                    console.log('Archivo XML actualizado correctamente.');
+                });
+            });
+        } catch (error) {
+            console.error(error);
+            // Manejar el error al procesar el archivo XML
+        }
+    });
+}
+
 
 
 app.listen(port, () => {
