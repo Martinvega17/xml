@@ -1,0 +1,14 @@
+<automoviles>
+   <auto>
+       <marca>Toyota</marca>
+       <modelo>Corolla</modelo>
+       <año>2020</año>
+   </auto>
+   <auto>
+       <marca>Honda</marca>
+       <modelo>Civic</modelo>
+       <año>2021</año>
+   </auto>
+   
+   <!-- Más automóviles aquí -->
+</automoviles>

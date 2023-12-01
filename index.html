@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Minibuscador de Automóviles</title>
+    <style>
+        /* Agrega estilos según tus preferencias */
+    </style>
+</head>
+
+<body>
+    <div id="busquedaForm">
+        <h2>Búsqueda de Automóviles</h2>
+        
+            <label for="modeloInput">Buscar por modelo:</label>
+            <input type="text" id="modeloInput" placeholder="Ingrese el modelo">
+            <button onclick="buscarPorModelo()">Buscar</button>
+        
+    </div>
+
+    <!-- Añade este bloque de código después del botón de búsqueda -->
+    <button onclick="mostrarFormulario()">Agregar Vehículos</button>
+
+    <div id="formularioAgregar" style="display:none;">
+        <h2>Agregar Vehículo</h2>
+        <form id="formulario">
+            <label for="marcaInput">Marca:</label>
+            <input type="text" id="marcaInput" required>
+
+            <label for="modeloInputNuevo">Modelo:</label>
+            <input type="text" id="modeloInputNuevo" required>
+
+            <label for="añoInput">Año:</label>
+            <input type="number" id="añoInput" required maxlength="4">
+
+            <button type="button" onclick="guardarAuto()">Guardar</button>
+        </form>
+    </div>
+
+    <div id="resultados">
+        <!-- Aquí se mostrarán los resultados -->
+    </div>
+
+    <script>
+     
+
+
+        function mostrarFormulario() {
+            document.getElementById('formularioAgregar').style.display = 'block';
+        }
+
+        function guardarAuto() {
+            const marca = document.getElementById('marcaInput').value;
+            const modelo = document.getElementById('modeloInputNuevo').value;
+            const año = document.getElementById('añoInput').value;
+
+            fetch('http://localhost:3000/guardarAuto', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ marca, modelo, año })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data.message);
+
+                })
+                .catch(error => console.error(error));
+        }
+
+        function buscarPorModelo() {
+        const modeloInput = document.getElementById('modeloInput').value;
+        fetch(`http://localhost:3000/buscarAutos?modelo=${modeloInput}`)
+            .then(response => {
+                if (response.status === 404) {
+                    throw new Error('No se encontraron resultados para el modelo especificado.');
+                }
+                return response.text();
+            })
+            .then(data => {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(data, 'text/xml');
+
+                const autos = xmlDoc.getElementsByTagName('auto');
+                const resultadosDiv = document.getElementById('resultados');
+
+                // Limpia los resultados anteriores
+                resultadosDiv.innerHTML = '';
+
+                // Verifica si hay resultados
+                if (autos.length > 0) {
+                    const marca = autos[0].getElementsByTagName('marca')[0].textContent;
+                    const modelo = autos[0].getElementsByTagName('modelo')[0].textContent;
+                    const año = autos[0].getElementsByTagName('año')[0].textContent;
+
+                    const resultado = document.createElement('p');
+                    resultado.textContent = `Marca: ${marca}, Modelo: ${modelo}, Año: ${año}`;
+                    resultadosDiv.appendChild(resultado);
+                } else {
+                    // Muestra un mensaje si no se encuentran resultados
+                    const mensajeNoExiste = document.createElement('p');
+                    mensajeNoExiste.textContent = 'No hay resultados para el modelo especificado.';
+                    resultadosDiv.appendChild(mensajeNoExiste);
+                }
+            })
+            .catch(error => {
+                // Muestra un mensaje de error si no se encuentran resultados
+                const resultadosDiv = document.getElementById('resultados');
+                resultadosDiv.innerHTML = `<p>${error.message}</p>`;
+            });
+    }
+
+
+
+
+    </script>
+</body>
+
+</html>
